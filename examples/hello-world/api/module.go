@@ -6,7 +6,7 @@ package api
 // The cost is that we must forward-declare the "py_" functions in the cgo preamble here
 
 import (
-	python "github.com/tliron/py4go"
+	python "github.com/mingfa929/py4go"
 )
 
 /*

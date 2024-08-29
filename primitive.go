@@ -155,8 +155,8 @@ func (self *Reference) IsUnicode() bool {
 	return self.Type().HasFlag(C.Py_TPFLAGS_UNICODE_SUBCLASS)
 }
 
-func (self *Reference) ToString() (string, error) {
-	if utf8stringBytes := C.PyUnicode_AsUTF8String(self.Object); utf8stringBytes != nil {
+func PyStr2GoStr(object *C.PyObject) (string, error){
+	if utf8stringBytes := C.PyUnicode_AsUTF8String(object); utf8stringBytes != nil {
 		defer C.Py_DecRef(utf8stringBytes)
 
 		if utf8string := C.PyBytes_AsString(utf8stringBytes); utf8string != nil {
@@ -166,7 +166,24 @@ func (self *Reference) ToString() (string, error) {
 		}
 	} else {
 		return "", GetError()
+	}  
+}
+
+func (self *Reference) ToList() ([]string, error) {
+	r := make([]string, 0)
+  size := C.PyList_Size(self.Object)
+
+	for i:= 0; i < int(size); i++ {
+	  item:= C.PyList_GetItem(self.Object, C.long(i))
+		r_,_:=PyStr2GoStr(item)
+	  r = append(r, r_)
 	}
+
+	return r, nil
+}
+
+func (self *Reference) ToString() (string, error) {
+	return PyStr2GoStr(self.Object)
 }
 
 //
